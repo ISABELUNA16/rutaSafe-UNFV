@@ -12,7 +12,7 @@ from matplotlib import cm
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score
 
-data = pd.read_csv("./denuncias_violencia_familiar2.csv", encoding = "ISO-8859-1")
+data = pd.read_csv("./denuncias_por_delito.csv", encoding = "ISO-8859-1")
 data_habitantes = pd.read_csv("./habitantes_por_departamento.csv", encoding = "ISO-8859-1")
 
 departamentos = []
@@ -32,8 +32,6 @@ for index, row in data.iterrows():
     i = 0
     for col in row:
         if i > 0 and index > 0:
-            print(index)
-            print(habitantess_por_departamentos[index-1])
             departamentos.append(habitantess_por_departamentos[index-1])
             años.append(2004 + i)
             denuncias.append(col)
@@ -46,13 +44,14 @@ dataX2["años"] = años
 #training
 XY_train = np.array(dataX2)
 z_train = np.array(denuncias)
-print(z_train)
 
-regresion = linear_model.LinearRegression()
+regresion = linear_model.Ridge(alpha=.5)
 
 regresion.fit(XY_train, z_train)
 
 z_pred = regresion.predict(XY_train)
+
+#print(regresion.score(XY_train, z_pred))
 
 # Veamos los coeficienetes obtenidos, En nuestro caso, serán la Tangente
 print('Coefficients: \n', regresion.coef_)
@@ -99,13 +98,13 @@ z = (nuevoX + nuevoY + regresion.intercept_)
 ax.plot_surface(xx, yy, z, alpha=0.2, cmap='hot')
 
 # Graficamos en azul los puntos en 3D
-ax.scatter(XY_train[:, 0], XY_train[:, 1], z_train, c='blue', s=5, label='Entrenamiento: año 2005 - 2017')
+ax.scatter(XY_train[:, 0], XY_train[:, 1], z_train, c='blue', s=2, label='Entrenamiento: año 2005 - 2017')
 
 # Graficamos en rojo, los puntos que
-ax.scatter(XY_train[:, 0], XY_train[:, 1], z_pred, c='red', s=5, label='Predicción del entrenamiento: año 2005 - 2017')
+ax.scatter(XY_train[:, 0], XY_train[:, 1], z_pred, c='red', s=2, label='Predicción del entrenamiento: año 2005 - 2017')
 
 # Graficamos en rojo, los puntos que
-ax.scatter(XY_new[:, 0], XY_new[:, 1], z_new, c='orange', s=5, label='Predicción futura: año 2018 - 2028')
+ax.scatter(XY_new[:, 0], XY_new[:, 1], z_new, c='orange', s=2, label='Predicción futura: año 2018 - 2028')
 
 ax.legend()
 
@@ -119,7 +118,7 @@ ax.view_init(elev=0., azim=5)
 
 ax.set_xlabel('Departamentos (Número de habitantes)')
 ax.set_ylabel('Año')
-ax.set_zlabel('Denuncias por Violencia Familiar')
+ax.set_zlabel('Denuncias por Comisión de delitos')
 ax.set_title('Regresión Lineal', loc='left')
 
 ax.set
