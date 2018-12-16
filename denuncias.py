@@ -25,6 +25,10 @@ for index, row in data2.iterrows():
             departamentos.append(index)
             años.append(i)
             denuncias.append(col)
+
+        if i > 12 and i < 16 and index > 12 and index < 16:
+            print(col)
+
         i = i + 1
 
 dataX2 = pd.DataFrame()
@@ -50,3 +54,40 @@ print('Independent term: \n', regresion.intercept_)
 print("Mean squared error: %.2f" % mean_squared_error(z_train, z_pred))
 # Puntaje de Varianza. El mejor puntaje es un 1.0
 print('Variance score: %.2f' % r2_score(z_train, z_pred))
+
+print('z_train')
+print(z_train)
+print('z_pred')
+print(z_pred)
+
+fig = plt.figure()
+ax = Axes3D(fig)
+
+# Creamos una malla, sobre la cual graficaremos el plano
+xx, yy = np.meshgrid(np.linspace(0, 3500, num=10), np.linspace(0, 60, num=10))
+
+# calculamos los valores del plano para los puntos x e y
+nuevoX = (regresion.coef_[0] * xx)
+nuevoY = (regresion.coef_[1] * yy)
+
+# calculamos los correspondientes valores para z. Debemos sumar el punto de intercepción
+z = (nuevoX + nuevoY + regresion.intercept_)
+
+# Graficamos el plano
+#.plot_surface(xx, yy, z, alpha=0.2, cmap='hot')
+
+# Graficamos en azul los puntos en 3D
+ax.scatter(XY_train[:, 0], XY_train[:, 1], z_train, c='blue', s=30)
+
+# Graficamos en rojo, los puntos que
+ax.scatter(XY_train[:, 0], XY_train[:, 1], z_pred, c='red', s=40)
+
+# con esto situamos la "camara" con la que visualizamos
+ax.view_init(elev=30., azim=65)
+
+ax.set_xlabel('Departamento')
+ax.set_ylabel('Año')
+ax.set_zlabel('Cantidad de Denuncias por violencía familiar')
+ax.set_title('Regresión Lineal para el modelo de denuncias')
+
+plt.show()
